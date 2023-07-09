@@ -9,12 +9,13 @@ import { IonicModule } from '@ionic/angular';
               <ion-tab-button tab="articles">
                   <ion-label style="font-size: 40px;">🗞️</ion-label>
               </ion-tab-button>
+            <ion-tab-button tab="search">
+              <ion-label><ion-icon size="large" name="search-outline"></ion-icon></ion-label>
+            </ion-tab-button>
           </ion-tab-bar>
       </ion-tabs>
 
-  `,
-  standalone: true,
-  imports: [IonicModule],
+  `
 })
 export class TabsPage {
 

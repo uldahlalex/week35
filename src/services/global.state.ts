@@ -5,6 +5,8 @@ import {Injectable} from "@angular/core";
 })
 export class GlobalState {
   articles: Article[] = [];
+  articleSearchResults: Article[] = [];
+  currentArticle: Article = {};
 }
 
 

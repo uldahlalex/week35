@@ -1,12 +1,9 @@
-
-
 import {Component} from '@angular/core';
-import {IonicModule, ModalController, ToastController} from '@ionic/angular';
-import {FormsModule} from "@angular/forms";
+import {ModalController, ToastController} from '@ionic/angular';
+import {FormBuilder} from "@angular/forms";
 import axios, {AxiosError} from 'axios';
 import {environment} from "../environments/environment";
 import {GlobalState} from "../services/global.state";
-import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'new-article-modal',
@@ -20,48 +17,46 @@ import {NgIf} from "@angular/common";
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <form (ngSubmit)="submitForm()">
+      <form [formGroup]="articleForm" (ngSubmit)="submitForm()">
         <ion-item>
-          <ion-label>Headline</ion-label>
-          <ion-input [(ngModel)]="headline"></ion-input>
+          <ion-input label="Headline" labelPlacement="floating" formControlName="headline"></ion-input>
+          <div *ngIf="articleForm.controls.headline.invalid && articleForm.controls.headline.touched" class="error">Headline is required</div>
         </ion-item>
         <ion-item>
-          <ion-label>Author</ion-label>
-          <ion-input [(ngModel)]="author"></ion-input>
+          <ion-input label="Author" labelPlacement="floating" formControlName="author"></ion-input>
+          <div *ngIf="articleForm.controls.author.invalid && articleForm.controls.author.touched" class="error">Author is required</div>
         </ion-item>
         <ion-item>
-          <ion-label>Body</ion-label>
-          <ion-textarea [(ngModel)]="body"></ion-textarea>
+          <ion-input label="Body" labelPlacement="floating" formControlName="body"></ion-input>
+          <div *ngIf="articleForm.controls.body.invalid && articleForm.controls.body.touched" class="error">Body is required</div>
         </ion-item>
         <ion-item>
-          <ion-label>Article image</ion-label>
-          <ion-input [(ngModel)]="articleImgUrl"></ion-input>
-
+          <ion-input label="Article image" labelPlacement="floating" formControlName="articleImgUrl"></ion-input>
+          <div *ngIf="articleForm.controls.articleImgUrl.invalid && articleForm.controls.articleImgUrl.touched" class="error">Image URL is required</div>
         </ion-item>
-        <ion-item *ngIf=" articleImgUrl!= undefined && articleImgUrl!=''">
+        <ion-item *ngIf="articleForm.controls.articleImgUrl.value">
           <ion-label>Image preview</ion-label>
-          <div><img style="max-height: 100px; width: auto;" [src]="articleImgUrl"></div>
+          <div><img style="max-height: 100px; width: auto;" [src]="articleForm.controls.articleImgUrl.value"></div>
         </ion-item>
-        <ion-button expand="full" type="submit">Create article</ion-button>
+
+        <ion-button expand="full" [disabled]="articleForm.invalid" type="submit" >Insert article</ion-button>
       </form>
     </ion-content>
-  `,
-  imports: [
-    IonicModule,
-    FormsModule,
-    NgIf
-  ],
-  standalone: true
+  `
 })
 export class NewArticleModalComponent {
-  headline: string = "";
-  author: string = "";
-  body: string = "";
-  articleImgUrl: string = "";
+
+  articleForm = this.fb.group({
+    headline: [''],
+    author: [''],
+    body: [''],
+    articleImgUrl: ['']
+  })
 
   constructor(private modalController: ModalController,
               public state: GlobalState,
-              public toastCtrl: ToastController) {
+              public toastCtrl: ToastController,
+              public fb: FormBuilder) {
   }
 
   dismissModal() {
@@ -69,13 +64,7 @@ export class NewArticleModalComponent {
   }
 
   submitForm() {
-    let dto = {
-      headline: this.headline,
-      author: this.author,
-      body: this.body,
-      articlmgUrl: this.articleImgUrl
-    }
-    axios.post(environment.baseUrl + '/articles', dto).then(res => {
+    axios.post(environment.baseUrl + '/articles', this.articleForm.getRawValue()).then(res => {
       this.state.articles.push(res.data.responseData);
       this.toastCtrl.create({
         color: 'success',

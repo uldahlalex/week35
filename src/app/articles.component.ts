@@ -5,15 +5,19 @@ import {environment} from "../environments/environment";
 import {Article, GlobalState} from "../services/global.state";
 import {JsonPipe, NgForOf} from "@angular/common";
 import {NewArticleModalComponent} from "./new-article.component";
-import {EditArticle} from "./edit-book.component";
+import {EditArticle} from "./edit-article.component";
 import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-articles',
   template: `
     <ion-header [translucent]="true">
       <ion-toolbar>
+        <ion-buttons>
+          <img style="max-height: 25px; width: auto" src="https://packroff.dk/wp-content/uploads/EASV-med-ramme.jpg">
+        </ion-buttons>
         <ion-title>
           The news feed <b style="font-size: 30px">📰</b>
 
@@ -27,17 +31,17 @@ import {firstValueFrom} from "rxjs";
         <ion-toolbar>
           <ion-title>{{article.headline}}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="presentEdit(article)">
-              <ion-icon name="cog-outline"></ion-icon>
+            <ion-button (click)="goToArticle(article.articleId)">
+              <ion-icon name="open-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
         <ion-grid>
           <ion-row>
-            <ion-col size="6"><img style="max-height: 100px; width: auto;" src="{{article.articleImgUrl}}">
+            <ion-col size="3"><img style="max-height: 100px; width: auto;" src="{{article.articleImgUrl}}">
             </ion-col>
-            <ion-col size="6">
-              <ion-text>by {{article.author}}</ion-text>
+            <ion-col size="9">
+              <i>{{article.body}} ... </i>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -51,14 +55,12 @@ import {firstValueFrom} from "rxjs";
       </ion-fab>
     </ion-content>
 
-  `,
-  standalone: true,
-  imports: [IonicModule, NgForOf, JsonPipe, HttpClientModule],
+  `
 })
 export class ArticlesComponent implements OnInit {
   constructor(public state: GlobalState,
               private modalCtrl: ModalController,
-              private http: HttpClient) {
+              private http: HttpClient, public router: Router) {
   }
 
   async getArticles() {
@@ -78,22 +80,14 @@ export class ArticlesComponent implements OnInit {
 
   async openNewArticleComponent() {
     this.modalCtrl.create({
-      component: 'NewArticleModalComponent'
+      component: NewArticleModalComponent
     })
       .then(function(modal) {
         return modal.present();
       });
   }
 
-  async presentEdit(article: Article) {
-
-    const modal = await this.modalCtrl.create({
-      component: 'EditArticle',
-      componentProps: {
-        article: {...article}
-      }
-    });
-
-    return await modal.present();
+  async goToArticle(articleId: number | undefined) {
+    this.router.navigate(['./tabs/articles/'+articleId]);
   }
 }
