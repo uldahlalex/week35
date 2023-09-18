@@ -65,7 +65,7 @@ export class NewArticleModalComponent {
 
   submitForm() {
     axios.post(environment.baseUrl + '/articles', this.articleForm.getRawValue()).then(res => {
-      this.state.articles.push(res.data.responseData);
+      this.state.articles.push(res.data);
       this.toastCtrl.create({
         color: 'success',
         duration: 2000,
@@ -76,10 +76,12 @@ export class NewArticleModalComponent {
       })
     }).catch(e => {
       if (e instanceof AxiosError) {
+        console.log(e);
+        console.log(e.response!.data.errors)
         this.toastCtrl.create({
           color: 'warning',
           duration: 2000,
-          message: e.response!.data.messageToClient
+          message: Object.values(e.response!.data.errors).toString()
         }).then(res => {
           res.present();
         })

@@ -67,7 +67,7 @@ export class ArticlesComponent implements OnInit {
     try {
 
       const res = await firstValueFrom<any>(this.http.get(environment.baseUrl + '/feed'));
-      this.state.articles = res.responseData;
+      this.state.articles = res;
     } catch (error) {
       console.log(error);
     }

@@ -52,7 +52,7 @@ export class ArticleDetailComponent implements OnInit {
 
   async getArticle() {
     const id = (await firstValueFrom(this.route.paramMap)).get('id');
-    this.state.currentArticle = (await firstValueFrom(this.httpClient.get<any>(environment.baseUrl + '/articles/' + id))).responseData;
+    this.state.currentArticle = (await firstValueFrom(this.httpClient.get<any>(environment.baseUrl + '/articles/' + id)));
   }
 
   openEditModal() {
